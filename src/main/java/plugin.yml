@@ -1,0 +1,32 @@
+name: CellMod
+author: Instipod
+main: com.instipod.cellmod.CellMod
+version: 3.0.3
+description: Cellular Phones in Minecraft.
+softdepend: [PermissionsEx, Vault]
+
+commands:
+  cell:
+    description: Pull out your phone.
+    usage: /cell
+  ct:
+    description: Create a new tower.
+    usage: /ct
+  send:
+    description: Send a text message
+    usage: /send
+  em:
+    description: Emergency contact
+    usage: /em
+  number:
+    description: Changes your number
+    usage: /number
+  directory:
+    description: View phone book of phone numbers
+    usage: /directory
+  plan:
+    description: View/Change Your Cellular Plan
+    usage: /plan
+  carrier:
+    description: View/Create Your Carrier
+    usage: /carrier
