@@ -8,6 +8,12 @@ roleplaying purposes.
 
 CellMod is released as open-source under the GNU Affero General Public License v3 license.
 
+TODO
+======
+- Update Numbers System to support multiple number changes for a per-carrier fee
+- Server taxes
+- Fix Formatting
+
 Compiling
 ===========
 CellMod is built to be compiled under Java 6 or newer.  You will also need Maven 3 for dependencies and compiling.
