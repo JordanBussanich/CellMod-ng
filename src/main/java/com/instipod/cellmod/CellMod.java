@@ -3,44 +3,42 @@ package com.instipod.cellmod;
 import com.alta189.sqlLibrary.MySQL.mysqlCore;
 import com.alta189.sqlLibrary.SQLite.sqlCore;
 import com.instipod.cellmod.commands.*;
-import com.instipod.handlers.EconomyHandle;
-import com.instipod.handlers.PermissionHandle;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CellMod extends JavaPlugin {
-    private final CommandManager commandManager = new CommandManager(this);
-    private playerListener playerListener;
-    public EconomyHandle economy = new EconomyHandle(this);
-    public PermissionHandle permission = new PermissionHandle(this);
-    public mysqlCore manageMySQL; // MySQL handler
+    private CommandManager commandManager = new CommandManager(this);
+    private UnifiedListener listener = new UnifiedListener(this);
+    private ConfigAccessor configAccessor;
+    
+    private Permission permission = null;
+    public Economy economy = null;
+    
+    public FileConfiguration mainConfig;
+    public FileConfiguration languageConfig;
+    
+    public mysqlCore manageMySQL;
     public sqlCore manageSQLite;
-    public File pFolder = new File("plugins" + File.separator + "CellMod");
     public Boolean MySQL = false;
-    private String dbHost = null;
-    private String dbUser = null;
-    private String dbPass = null;
-    private String dbDatabase = null;
-    private Integer towercount = 0;
+    
     public HashMap<Location,String> globaltos = new HashMap<Location,String>();
     public HashMap<String,Carrier> carriers = new HashMap<String,Carrier>();
-    private blockListener bListener;
     
     @Override
     public void onDisable() {
@@ -49,26 +47,21 @@ public class CellMod extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        playerListener = new playerListener(this);
-        bListener = new blockListener(this);
         TLogger.initialize(this, Logger.getLogger("Minecraft"));
+        
         try {
             loadConfig();
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-        if ("sqlite".equals(config.getProperty("database-type"))) {
+        if ("sqlite".equals(mainConfig.getString("database.type"))) {
             MySQL = false;
         } else {
             MySQL = true;
-            dbHost = config.getProperty("database-mysql-host");
-            dbDatabase = config.getProperty("database-mysql-name");
-            dbUser = config.getProperty("database-mysql-user");
-            dbPass = config.getProperty("database-mysql-pass");
         }
                 if (this.MySQL) {
 			// Declare MySQL Handler
-			this.manageMySQL = new mysqlCore(Logger.getLogger("Minecraft"), "[CellMod] ", this.dbHost, this.dbDatabase, this.dbUser, this.dbPass);
+			this.manageMySQL = new mysqlCore(Logger.getLogger("Minecraft"), "[CellMod] ", mainConfig.getString("database.mysql-host"), mainConfig.getString("database.mysql-db"), mainConfig.getString("database.mysql-user"), mainConfig.getString("database.mysql-pass"));
 			
 			TLogger.info("MySQL Initializing");
 			// Initialize MySQL Handler
@@ -115,7 +108,7 @@ public class CellMod extends JavaPlugin {
 			TLogger.info("SQLite Initializing");
 			
 			// Declare SQLite handler
-			this.manageSQLite = new sqlCore(Logger.getLogger("Minecraft"), "[CellMod] ", "CellMod", pFolder.getPath());
+			this.manageSQLite = new sqlCore(Logger.getLogger("Minecraft"), "[CellMod] ", "CellMod", getDataFolder().getPath());
 			
 			// Initialize SQLite handler
 			this.manageSQLite.initialize();
@@ -155,7 +148,8 @@ public class CellMod extends JavaPlugin {
         } catch (Exception ex) {
             TLogger.log(Level.SEVERE, "A Carrier Has An Invaild Message Cost! Must be an Integer or Double!");
         }
-                ResultSet rs = getResult("SELECT * FROM towers;");
+        ResultSet rs = getResult("SELECT * FROM towers;");
+        int towercount = 0;
         try {
             while (rs.next()) {
                 Integer blockx = Integer.parseInt(rs.getString("BlockX"));
@@ -170,18 +164,17 @@ public class CellMod extends JavaPlugin {
             }
         } catch (SQLException ex) {
         }
-        TLogger.log(Level.INFO, towercount.toString() + " towers loaded.");
-        if (!economy.setup()) {
-            TLogger.log(Level.SEVERE, "Failed to find Economy!");
+        TLogger.log(Level.INFO, towercount + " towers loaded.");
+        if (!setupEconomy()) {
+            TLogger.log(Level.SEVERE, "Failed to initialize Economy!");
         }
-        if (!permission.setup()) {
-            TLogger.log(Level.SEVERE, "Failed to find Permissions!");
+        if (!setupPermissions()) {
+            TLogger.log(Level.SEVERE, "Failed to initialize Permissions!");
         }
         addCommand("cell", cellcmd);
         addCommand("number", numcmd);
         addCommand("send", sendcmd);
         addCommand("ct", cccmd);
-        addCommand("em", emcmd);
         addCommand("directory", phonebookcmd);
         addCommand("plan", plancmd);
         addCommand("carrier", carriercmd);
@@ -192,7 +185,6 @@ public class CellMod extends JavaPlugin {
     public NumberCmd numcmd = new NumberCmd(this);
     public SendCmd sendcmd = new SendCmd(this);
     public CCCmd cccmd = new CCCmd(this);
-    public EmCmd emcmd = new EmCmd(this);
     public PhonebookCmd phonebookcmd = new PhonebookCmd(this);
     public PlanCmd plancmd = new PlanCmd(this);
     public CarrierCmd carriercmd = new CarrierCmd(this);
@@ -213,7 +205,7 @@ public class CellMod extends JavaPlugin {
        if (!"".equals(thecarrier)) {
            return carriers.get(thecarrier).getSignal(p, effect);
        } else {
-           return lang.getProperty("NoService") + " [    ]";
+           return languageConfig.getString("NoService") + " [    ]";
        }
     }
     public Double getDistance(Player p, Double effect) {
@@ -263,92 +255,19 @@ public class CellMod extends JavaPlugin {
             return false;
         }
     }
-    public File configfile = new File("plugins/CellMod/config.properties");
-    public File langfile = new File("plugins/CellMod/language.properties");
-    public File folder = new File("plugins/CellMod/");
-    public Properties prop = new Properties();
-    public Properties lang = new Properties();
-    public Properties config = new Properties();
-    public FileInputStream filein;
-    public Integer blockint = 0;
     
     private void loadConfig() throws IOException {
-        if (!folder.isDirectory()) {
-            folder.mkdir();
-        }
-        if(!configfile.exists()) {
-            configfile.createNewFile();
-            FileOutputStream out = new FileOutputStream(configfile);
-	    prop.put("tower-material-id", "1");
-            prop.put("database-type", "sqlite");
-            prop.put("database-mysql-name", "cellmod");
-            prop.put("database-mysql-user", "root");
-            prop.put("database-mysql-pass", "");
-            prop.put("database-mysql-host", "localhost");
-	    prop.store(out, "CellMod 3.x Configuration File");
-	    out.flush();
-	    out.close();
-	    prop.clear();
-        }
-        if(!langfile.exists()) {
-            langfile.createNewFile();
-            if (langfile.exists()) {
-            FileOutputStream out = new FileOutputStream(langfile);
-	    prop.put("NoService", "No Service");
-            prop.put("Header", "---- Phone ----");
-            prop.put("NoPermission", "You do not have permission.");
-            prop.put("WrongBlockType", "This material cannot be identifed as a tower.");
-            prop.put("TypeSend", "Type /send to send a new message.");
-            prop.put("InvaildNumber", "The number entered was invalid.");
-            prop.put("MessageSent", "Your message was sent.");
-            prop.put("TowerDist", "Tower Distance");
-            prop.put("AntennaType", "Antenna Type");
-            prop.put("Pumpkin", "PUMPKIN Extended Range");
-            prop.put("Standard", "Standard");
-            prop.put("NumberIs", "Your number is ");
-            prop.put("From", "From");
-            prop.put("ServiceRequired", "Service is required to perform this action.");
-            prop.put("WrongLength", "You must enter a phone number and message.");
-            prop.put("EmTitle", "911 Call");
-            prop.put("EmWrongLength", "You must enter a message.");
-            prop.put("EmSent", "Your 911 call was sent to all online administrators.");
-            prop.put("NumChanged", "Your number was changed.");
-            prop.put("NumNoMore", "You may not change your number any more!");
-            prop.put("NumWrongLength", "You must enter a new number!");
-            prop.put("TCreated", "Cell Tower Created.");
-            prop.put("TDestroyed", "Cell Tower Destroyed.");
-            prop.put("NumAlready", "That phone number is already taken.");
-            prop.put("PhonebookTitle", "Currently Connected Users");
-            prop.put("InvaildDevice", "There is no such device on the network.");
-            prop.put("PlanCount1", "Your current plan has ");
-            prop.put("PlanCount2", " messages remaining.");
-            prop.put("Carrier", "Carrier");
-            prop.put("CarrierIs", "Your carrier is ");
-            prop.put("RateSet", "Text message rate set.");
-            prop.put("BuyMessages", "To buy messages type: /plan buy [number of messages]");
-            prop.put("MessagesCost", "The price per message is: ");
-            prop.put("JoinNetwork", "Join a Carrier first!");
-            prop.put("MoreMoney", "You need more money to purchase that!");
-            prop.put("GoodPurchase", "Your purchase was successful!");
-            prop.put("CreateCarrier", "The carrier was created!");
-            prop.put("InvaildCarrier", "Invaild Carrier Name!");
-            prop.put("JoinedCarrier", "You joined the carrier.");
-            prop.put("NoMessagesPlan", "You don't have any messages left on your plan.");
-            prop.put("ChangedPrice", "The message cost was changed.");
-	    prop.store(out, "CellMod 3.x Language File");
-	    out.flush();
-	    out.close();
-	    prop.clear();
-            } else {
-                TLogger.log(Level.SEVERE, "Failed to create language file.");
-            }
-        }
-        filein = new FileInputStream(langfile);
-        lang.load(filein);
-        filein.close();
-        filein = new FileInputStream(configfile);
-        config.load(filein);
-        filein.close();
+        //load main configuration
+        saveDefaultConfig();
+        mainConfig = getConfig();
+        mainConfig.options().copyDefaults(true);
+
+        mainConfig.set("donotchange.version", getDescription().getVersion());
+        saveConfig();
+        
+        //load language file
+        configAccessor = new ConfigAccessor(this, "language.yml");
+        languageConfig = configAccessor.getConfig();
     }
     
     @Override
@@ -429,8 +348,25 @@ public class CellMod extends JavaPlugin {
 				manageSQLite.deleteQuery(query);
 			}
     }
+    
+    private boolean setupPermissions() {
+        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (permissionProvider != null) {
+            permission = permissionProvider.getProvider();
+        }
+        return (permission != null);
+    }
+    
+    private boolean setupEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+
+        return (economy != null);
+    }
      
      public boolean hasPermission(Player p, String perm) {
-         return permission.hasPermission(p, perm);
+         return permission.has(p, perm);
      }
 }

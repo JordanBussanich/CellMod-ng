@@ -1,7 +1,11 @@
 package com.instipod.cellmod.commands;
 
 import com.instipod.cellmod.CellMod;
+import com.instipod.cellmod.TLogger;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -44,41 +48,73 @@ public class SendCmd implements CommandExecutor {
                     while(getplayerfromnumber.next()) {
                         messageto = plugin.getServer().getPlayer(getplayerfromnumber.getString("Player"));
                     }
-                    if (messageto == null) {
-                         messagefrom.sendMessage(plugin.lang.getProperty("Header"));
-            messagefrom.sendMessage(plugin.getPlayerCarrierName(messagefrom) + " " + plugin.getSignal(messagefrom, 0.0));
-            messagefrom.sendMessage(plugin.lang.getProperty("InvaildDevice"));
+                    if (messageto == null && strings[0].equals(plugin.mainConfig.getString("phone.specialnumbers.emergency"))) {
+                        messagefrom.sendMessage(plugin.languageConfig.getString("Header"));
+                        messagefrom.sendMessage(plugin.getPlayerCarrierName(messagefrom) + " " + plugin.getSignal(messagefrom, 0.0));
+                        messagefrom.sendMessage(plugin.languageConfig.getString("InvaildDevice"));
                     } else {
-                        if (plugin.getPlayerCarrier(messagefrom).getPlayerRemainingMessages(messagefrom) > 0) {
-                            Integer remaining = plugin.getPlayerCarrier(messagefrom).getPlayerRemainingMessages(messagefrom) - 1;
-                    sendText(messagefrom, messageto, text);
+                        if (plugin.getPlayerCarrier(messagefrom).getPlayerRemainingMessages(messagefrom) > 0 || (strings[0].equals(plugin.mainConfig.getString("phone.specialnumbers.emergency")) && plugin.mainConfig.getBoolean("phone.charge-emergency"))) {
+                            if (!(strings[0].equals(plugin.mainConfig.getString("phone.specialnumbers.emergency")) && plugin.mainConfig.getBoolean("phone.charge-emergency"))) {
+                                Integer remaining = plugin.getPlayerCarrier(messagefrom).getPlayerRemainingMessages(messagefrom) - 1;
+                                plugin.getPlayerCarrier(messagefrom).setPlayerRemainingMessage(messagefrom, remaining);
+                            }
+                            sendText(messagefrom, messageto, strings[0], text);
                         } else {
-                            messagefrom.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoMessagesPlan"));
+                            messagefrom.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoMessagesPlan"));
                         }
                     }
                 } catch (Exception ex) {
                     System.out.println(ex.toString());
                 }
                 } else {
-                    cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("JoinNetwork"));
+                    cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("JoinNetwork"));
                 }
             } else {
-                cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+                cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
             }
         } else {
-            cs.sendMessage(plugin.lang.getProperty("WrongLength"));
+            cs.sendMessage(plugin.languageConfig.getString("WrongLength"));
         }
         return true;
     }
-    public void sendText(Player from, Player to, String text) {
-        String noservice = plugin.lang.getProperty("NoService") + " [    ]";
+    public void sendText(Player from, Player to, String tonum, String text) {
+        String noservice = plugin.languageConfig.getString("NoService") + " [    ]";
+        if (to == null  && tonum.equals(plugin.mainConfig.getString("phone.specialnumbers.emergency"))) {
+            if (!noservice.equals(plugin.getSignal(from, 0.0)) || !plugin.mainConfig.getBoolean("phone.require-service-emergency")) {
+                from.sendMessage(plugin.languageConfig.getString("Header"));
+                from.sendMessage(plugin.getPlayerCarrierName(from) + " " + plugin.getSignal(from, 0.0));
+                from.sendMessage(plugin.languageConfig.getString("MessageSent"));
+                
+                ResultSet fromnumber = plugin.getResult("SELECT * from players WHERE Player='" + from.getName() + "';");
+                String fromnum = "";
+                try {
+                    while(fromnumber.next()) {
+                        fromnum = fromnumber.getString("Number");
+                    }
+                } catch (Exception ex) {
+                    fromnum = "0000";
+                }
+            
+                Player[] players = plugin.getServer().getOnlinePlayers();
+                for (Player p : players) {
+                    if (plugin.hasPermission(p, "cellmod.emcontact")) {
+                        p.sendMessage(ChatColor.RED + "[" + plugin.languageConfig.getString("EmTitle") + "] (" + from.getName() + " / " + fromnum + ") " + text);
+                    }
+                }
+            } else {
+                from.sendMessage(plugin.languageConfig.getString("Header"));
+                from.sendMessage(plugin.getPlayerCarrierName(from) + " " + plugin.getSignal(from, 0.0));
+                from.sendMessage(plugin.languageConfig.getString("ServiceRequired"));
+            }
+            return;
+        }
         if (to.isOnline()) {
             if (!noservice.equals(plugin.getSignal(to, 0.0))) {
                 if (!noservice.equals(plugin.getSignal(from, 0.0))) {
-            from.sendMessage(plugin.lang.getProperty("Header"));
+            from.sendMessage(plugin.languageConfig.getString("Header"));
             from.sendMessage(plugin.getPlayerCarrierName(from) + " " + plugin.getSignal(from, 0.0));
-            from.sendMessage(plugin.lang.getProperty("MessageSent"));
-            to.sendMessage(plugin.lang.getProperty("Header"));
+            from.sendMessage(plugin.languageConfig.getString("MessageSent"));
+            to.sendMessage(plugin.languageConfig.getString("Header"));
             to.sendMessage(plugin.getPlayerCarrierName(to) + " " + plugin.getSignal(to, 0.0));
             ResultSet fromnumber = plugin.getResult("SELECT * from players WHERE Player='" + from.getName() + "';");
             String fromnum = "";
@@ -89,23 +125,23 @@ public class SendCmd implements CommandExecutor {
             } catch (Exception ex) {
                 fromnum = "0000";
             }
-            to.sendMessage(plugin.lang.getProperty("From") + ": " + from.getName() + " (" + fromnum + ")");
+            to.sendMessage(plugin.languageConfig.getString("From") + ": " + from.getName() + " (" + fromnum + ")");
             to.sendMessage(text);
                 } else {
-                    from.sendMessage(plugin.lang.getProperty("Header"));
+                    from.sendMessage(plugin.languageConfig.getString("Header"));
             from.sendMessage(plugin.getPlayerCarrierName(from) + " " + plugin.getSignal(from, 0.0));
-            from.sendMessage(plugin.lang.getProperty("ServiceRequired"));
+            from.sendMessage(plugin.languageConfig.getString("ServiceRequired"));
                 }
             } else {
-                from.sendMessage(plugin.lang.getProperty("Header"));
+                from.sendMessage(plugin.languageConfig.getString("Header"));
             from.sendMessage(plugin.getPlayerCarrierName(from) + " " + plugin.getSignal(from, 0.0));
-            from.sendMessage(plugin.lang.getProperty("MessageSent"));
+            from.sendMessage(plugin.languageConfig.getString("MessageSent"));
             plugin.runInsertQuery("INSERT INTO backlog (FromUser, ToUser, MessageText) VALUES ('" + from.getName() + "', '" + to.getName() + "', '" + text + "');");
             }
         } else {
-            from.sendMessage(plugin.lang.getProperty("Header"));
+            from.sendMessage(plugin.languageConfig.getString("Header"));
             from.sendMessage(plugin.getPlayerCarrierName(from) + " " + plugin.getSignal(from, 0.0));
-            from.sendMessage(plugin.lang.getProperty("MessageSent"));
+            from.sendMessage(plugin.languageConfig.getString("MessageSent"));
             plugin.runInsertQuery("INSERT INTO backlog (FromUser, ToUser, MessageText) VALUES ('" + from.getName() + "', '" + to.getName() + "', '" + text + "');");
         }
     }

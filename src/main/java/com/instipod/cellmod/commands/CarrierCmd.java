@@ -31,7 +31,7 @@ public class CarrierCmd implements CommandExecutor {
                 if (strings.length < 1) {
                     // /carrier
                     if (plugin.getPlayerCarrier(p) != null) {
-                    p.sendMessage(plugin.lang.getProperty("CarrierIs") + ChatColor.GREEN + plugin.getPlayerCarrier(p).getName());
+                    p.sendMessage(plugin.languageConfig.getString("CarrierIs") + ChatColor.GREEN + plugin.getPlayerCarrier(p).getName());
                     ResultSet rs = plugin.getResult("SELECT * FROM players WHERE Player='" + p.getName() + "';");
                     String number = null;
                     String count = null;
@@ -43,10 +43,10 @@ public class CarrierCmd implements CommandExecutor {
                     } catch (Exception ex) {
                         TLogger.log(Level.SEVERE, "Failed to read player number!");
                     }
-                    p.sendMessage(plugin.lang.getProperty("NumberIs") + ChatColor.GREEN + number);
-                    p.sendMessage(plugin.lang.getProperty("MessagesCost") + ChatColor.RED + plugin.getPlayerCarrier(p).getCost().toString());
+                    p.sendMessage(plugin.languageConfig.getString("NumberIs") + ChatColor.GREEN + number);
+                    p.sendMessage(plugin.languageConfig.getString("MessagesCost") + ChatColor.RED + plugin.getPlayerCarrier(p).getCost().toString());
                 } else {
-                        cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("JoinNetwork"));
+                        cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("JoinNetwork"));
                     }
                 } else {
                     //carrier []
@@ -56,9 +56,9 @@ public class CarrierCmd implements CommandExecutor {
                                 plugin.runInsertQuery("INSERT INTO carriers (Name, Owner, MessagePrice) VALUES ('" + strings[1] + "', '" + p.getName() + "', '1.0');");
                                 plugin.carriers.put(strings[1], new Carrier(plugin, strings[1], p.getName(), 1.0));
                                 plugin.runUpdateQuery("UPDATE players SET Carrier='" + strings[1] + "' WHERE Player='" + p.getName() + "';");
-                                p.sendMessage(ChatColor.GREEN + plugin.lang.getProperty("CreateCarrier"));
+                                p.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("CreateCarrier"));
                             } else {
-                                p.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+                                p.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
                             }
                         } else {
                             p.sendMessage(ChatColor.RED + "/carrier create [name]");
@@ -69,10 +69,10 @@ public class CarrierCmd implements CommandExecutor {
                                 Carrier playercarrier = plugin.getPlayerCarrier(p);
                                 if (plugin.isPlayerCarrierOwner(p, playercarrier)) {
                                 plugin.runUpdateQuery("UPDATE carriers SET MessagePrice='" + strings[1] + "' WHERE Name='" + playercarrier.getName() + "';");
-                                p.sendMessage(ChatColor.GREEN + plugin.lang.getProperty("ChangedPrice"));
+                                p.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("ChangedPrice"));
                                 } else {
                                     // no permission
-                                    p.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+                                    p.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
                                 }
                              } else {
                              p.sendMessage(ChatColor.RED + "/carrier setprice [price]");
@@ -82,9 +82,9 @@ public class CarrierCmd implements CommandExecutor {
                                 if (strings[1] != null) {
                                 if (plugin.carriers.get(strings[1]) != null) {
                                     plugin.runUpdateQuery("UPDATE players SET Carrier='" + strings[1] + "', Plan='0' WHERE Player='" + p.getName() + "';");
-                                    p.sendMessage(ChatColor.GREEN + plugin.lang.getProperty("JoinedCarrier"));
+                                    p.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("JoinedCarrier"));
                                 } else {
-                                    p.sendMessage(ChatColor.RED + plugin.lang.getProperty("InvaildCarrier"));
+                                    p.sendMessage(ChatColor.RED + plugin.languageConfig.getString("InvaildCarrier"));
                                 }
                                 } else {
                                 p.sendMessage(ChatColor.RED + "/carrier join [name]");

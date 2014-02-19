@@ -34,14 +34,14 @@ public class CellCmd implements CommandExecutor {
                 cs.sendMessage("This server is running version " + plugin.getDescription().getVersion() + " of the CellMod plugin by Instipod.");
             }
             if ("debug".equals(strings[0])) {
-                cs.sendMessage(plugin.lang.getProperty("Header"));
+                cs.sendMessage(plugin.languageConfig.getString("Header"));
                 cs.sendMessage(plugin.getPlayerCarrier((Player) cs).getName() + " " + plugin.getSignal((Player) cs, 0.0));
                 cs.sendMessage("Distance: " + plugin.getDistance(p, 0.0).toString());
             }
         } else {
         if (plugin.hasPermission((Player) cs, "cellmod.use")) {
             if (plugin.getPlayerCarrier((Player) cs) != null) {
-           cs.sendMessage(plugin.lang.getProperty("Header"));
+           cs.sendMessage(plugin.languageConfig.getString("Header"));
            cs.sendMessage(plugin.getPlayerCarrier((Player) cs).getName() + " " + plugin.getSignal((Player) cs, 0.0));
            Player player = (Player) cs;
            ResultSet rs = plugin.getResult("SELECT * FROM players WHERE Player='" + player.getName() + "';");
@@ -53,13 +53,13 @@ public class CellCmd implements CommandExecutor {
         } catch (SQLException ex) {
             TLogger.log(Level.SEVERE, "Failed to read player number!");
         }
-           player.sendMessage(plugin.lang.getProperty("NumberIs") + " " + number);
-           cs.sendMessage(plugin.lang.getProperty("TypeSend"));
+           player.sendMessage(plugin.languageConfig.getString("NumberIs") + " " + number);
+           cs.sendMessage(plugin.languageConfig.getString("TypeSend"));
         } else {
-                cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("JoinNetwork"));
+                cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("JoinNetwork"));
             }
         } else {
-            cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+            cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
         }
         
     }

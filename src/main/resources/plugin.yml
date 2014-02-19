@@ -4,7 +4,6 @@ main: com.instipod.cellmod.CellMod
 version: 4.0-SNAPSHOT
 description: Cellular Phones in Minecraft.
 depend: [Vault]
-softdepend: [PermissionsEx]
 
 commands:
   cell:
@@ -16,9 +15,6 @@ commands:
   send:
     description: Send a text message
     usage: /send
-  em:
-    description: Emergency contact
-    usage: /em
   number:
     description: Changes your number
     usage: /number

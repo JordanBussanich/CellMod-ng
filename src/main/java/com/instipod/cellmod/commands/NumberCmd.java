@@ -2,7 +2,6 @@ package com.instipod.cellmod.commands;
 
 import com.instipod.cellmod.CellMod;
 import com.instipod.cellmod.TLogger;
-import java.io.FileOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -51,22 +50,25 @@ public class NumberCmd implements CommandExecutor {
         } catch (SQLException ex) {
             TLogger.log(Level.SEVERE, "Failed to read player number for API access!");
         }
+        if (strings[0].equals(plugin.mainConfig.getString("phone.specialnumbers.carrier")) || strings[0].equals(plugin.mainConfig.getString("phone.specialnumbers.emergency"))) {
+            inuse = true;
+        }
         if (changed == false) {
             if (inuse == false) {
             plugin.runUpdateQuery("UPDATE players SET Number='" + strings[0] + "', Changed='true' WHERE Player='" + player.getName() + "';");
-            player.sendMessage(ChatColor.GREEN + plugin.lang.getProperty("NumChanged"));
+            player.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("NumChanged"));
             } else {
-                player.sendMessage(ChatColor.RED + plugin.lang.getProperty("NumAlready"));
+                player.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NumAlready"));
             }
         } else {
-            player.sendMessage(ChatColor.RED + plugin.lang.getProperty("NumNoMore"));
+            player.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NumNoMore"));
         }
         } else {
-            player.sendMessage(ChatColor.RED + plugin.lang.getProperty("NumWrongLength"));
+            player.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NumWrongLength"));
         }
         return true;
     } else {
-            player.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+            player.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
             return true;
         }
     }

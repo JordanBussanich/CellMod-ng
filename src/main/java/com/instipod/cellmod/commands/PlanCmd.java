@@ -30,7 +30,7 @@ public class PlanCmd implements CommandExecutor {
         if (plugin.hasPermission(p, "cellmod.use")) {
             if (plugin.getPlayerCarrier(p) != null) {
                 if (strings.length < 1) {
-                    p.sendMessage(plugin.lang.getProperty("CarrierIs") + ChatColor.GREEN + plugin.getPlayerCarrier(p).getName());
+                    p.sendMessage(plugin.languageConfig.getString("CarrierIs") + ChatColor.GREEN + plugin.getPlayerCarrier(p).getName());
                     ResultSet rs = plugin.getResult("SELECT * FROM players WHERE Player='" + p.getName() + "';");
                     String number = null;
                     String count = null;
@@ -42,9 +42,9 @@ public class PlanCmd implements CommandExecutor {
                     } catch (Exception ex) {
                         TLogger.log(Level.SEVERE, "Failed to read player number!");
                     }
-                    p.sendMessage(plugin.lang.getProperty("NumberIs") + ChatColor.GREEN + number);
-                    p.sendMessage(plugin.lang.getProperty("PlanCount1") + ChatColor.RED + count + ChatColor.WHITE + plugin.lang.getProperty("PlanCount2"));
-                    p.sendMessage(plugin.lang.getProperty("BuyMessages"));
+                    p.sendMessage(plugin.languageConfig.getString("NumberIs") + ChatColor.GREEN + number);
+                    p.sendMessage(plugin.languageConfig.getString("PlanCount1") + ChatColor.RED + count + ChatColor.WHITE + plugin.languageConfig.getString("PlanCount2"));
+                    p.sendMessage(plugin.languageConfig.getString("BuyMessages"));
                 } else {
                     if (strings.length > 1) {
                         if (strings[0].equals("buy")) {
@@ -55,22 +55,22 @@ public class PlanCmd implements CommandExecutor {
                                 p.sendMessage(ChatColor.RED + "Message amount must be a number!");
                             }
                             Double cost = amount * plugin.getPlayerCarrier(p).getCost();
-                            if (plugin.economy.hasMoney(p, cost)) {
-                                plugin.economy.takeMoney(p, cost);
+                            if (plugin.economy.has(p.getName(), cost)) {
+                                plugin.economy.withdrawPlayer(p.getName(), cost);
                                 Integer newcount = amount + plugin.getPlayerCarrier(p).getPlayerRemainingMessages(p);
                                 plugin.runUpdateQuery("UPDATE players SET Plan='" + newcount.toString() + "' WHERE Player='" + p.getName() + "';");
-                                p.sendMessage(ChatColor.GREEN  + plugin.lang.getProperty("GoodPurchase"));
+                                p.sendMessage(ChatColor.GREEN  + plugin.languageConfig.getString("GoodPurchase"));
                             } else {
-                                cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("MoreMoney"));
+                                cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("MoreMoney"));
                             }
                         }
                     }
                 }
             } else {
-                cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("JoinNetwork"));
+                cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("JoinNetwork"));
             }
         } else {
-            cs.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+            cs.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
         }
         return true;
     }

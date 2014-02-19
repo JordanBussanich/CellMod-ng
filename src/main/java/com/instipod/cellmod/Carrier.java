@@ -26,7 +26,7 @@ public class Carrier {
                 tosearch.add(l);
             }
         }
-        String message = plugin.lang.getProperty("NoService") + " [    ]";
+        String message = plugin.languageConfig.getString("NoService") + " [    ]";
         Location from = player.getLocation();
         double disSqu = 0;
         Location best = null;
@@ -43,7 +43,7 @@ public class Carrier {
 }
         Double dist = best.distance(player.getLocation()) - effect;
              if (dist > 170) {
-                 message = plugin.lang.getProperty("NoService") + " [    ]";
+                 message = plugin.languageConfig.getString("NoService") + " [    ]";
              } else {
                  if (dist < 30) {
                  message = "3G [" + ChatColor.GREEN + "-----" + ChatColor.WHITE + "]";
@@ -66,7 +66,7 @@ public class Carrier {
              }
              }
         } else {
-            message = plugin.lang.getProperty("NoService") + " [    ]";
+            message = plugin.languageConfig.getString("NoService") + " [    ]";
         }
              return message;
     }
@@ -126,5 +126,8 @@ public class Carrier {
             TLogger.log(Level.SEVERE, "Failed to read player number!");
         }
         return Integer.parseInt(count);
+    }
+    public void setPlayerRemainingMessage(Player p, Integer messages) {
+        plugin.runUpdateQuery("UPDATE players SET Plan=" + messages + " WHERE Player='" + p.getName() + "';");
     }
 }

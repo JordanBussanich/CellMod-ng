@@ -1,0 +1,27 @@
+database:
+    type: sqlite
+    mysql-host: localhost
+    mysql-db: cellmod
+    mysql-user: root
+    mysql-pass: default
+    
+towers:
+    material: 1
+    force-material: true
+    economy:
+        make-tower: 10
+        refund-destroy-tower: 0
+        
+carrier:
+    economy:
+        create-carrier: 20
+        refund-delete-carrier: 0
+        
+phone:
+    number-length: 4
+    require-service-emergency: true
+    charge-emergency: false
+    specialnumbers:
+        carrier: 611
+        emergency: 911
+    

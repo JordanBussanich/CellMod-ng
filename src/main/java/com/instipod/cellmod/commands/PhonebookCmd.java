@@ -31,7 +31,7 @@ public class PhonebookCmd implements CommandExecutor {
         }
         Player player = (Player) cs;
         if (plugin.hasPermission(player, "cellmod.use")) {
-            player.sendMessage(plugin.lang.getProperty("PhonebookTitle") + ":");
+            player.sendMessage(plugin.languageConfig.getString("PhonebookTitle") + ":");
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                  ResultSet rs = plugin.getResult("SELECT * FROM players WHERE Player='" + p.getName() + "';");
         String number = null;
@@ -45,7 +45,7 @@ public class PhonebookCmd implements CommandExecutor {
                 player.sendMessage(p.getName() + " - " + number);
             }
         } else {
-            player.sendMessage(ChatColor.RED + plugin.lang.getProperty("NoPermission"));
+            player.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
         }
         return true;
     }
