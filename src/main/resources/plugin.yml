@@ -1,9 +1,10 @@
 name: CellMod
 author: Instipod
 main: com.instipod.cellmod.CellMod
-version: 3.0.3
+version: 4.0-SNAPSHOT
 description: Cellular Phones in Minecraft.
-softdepend: [PermissionsEx, Vault]
+depend: [Vault]
+softdepend: [PermissionsEx]
 
 commands:
   cell:
