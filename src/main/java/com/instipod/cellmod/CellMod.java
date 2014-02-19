@@ -24,7 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CellMod extends JavaPlugin {
     private CommandManager commandManager = new CommandManager(this);
-    private UnifiedListener listener = new UnifiedListener(this);
+    private UnifiedListener listener;
     private ConfigAccessor configAccessor;
     
     private Permission permission = null;
@@ -54,6 +54,7 @@ public class CellMod extends JavaPlugin {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
+        
         if ("sqlite".equals(mainConfig.getString("database.type"))) {
             MySQL = false;
         } else {
@@ -165,12 +166,16 @@ public class CellMod extends JavaPlugin {
         } catch (SQLException ex) {
         }
         TLogger.log(Level.INFO, towercount + " towers loaded.");
+        
         if (!setupEconomy()) {
             TLogger.log(Level.SEVERE, "Failed to initialize Economy!");
         }
         if (!setupPermissions()) {
             TLogger.log(Level.SEVERE, "Failed to initialize Permissions!");
         }
+        
+        listener = new UnifiedListener(this);
+        
         addCommand("cell", cellcmd);
         addCommand("number", numcmd);
         addCommand("send", sendcmd);
