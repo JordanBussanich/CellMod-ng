@@ -13,16 +13,16 @@ public class EconomyHandle {
         plugin = instance;
     }
     
-    public void setup()
+    public boolean setup()
     {
         if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
-            return;
+            return false;
         }
-        RegisteredServiceProvider<Economy> rsp = plugin.getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return;
+        RegisteredServiceProvider<Economy> economyProvider = plugin.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            econ = economyProvider.getProvider();
         }
-        econ = rsp.getProvider();
+        return (econ != null);
     }
     
     public Boolean hasMoney(Player p, Double amount) {

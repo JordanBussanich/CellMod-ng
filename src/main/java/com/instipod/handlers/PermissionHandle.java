@@ -13,15 +13,15 @@ public class PermissionHandle {
         this.plugin = instance;
     }
     
-    public void setup() {
+    public boolean setup() {
         if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
-            return;
+            return false;
         }
-        RegisteredServiceProvider<Permission> rsp = plugin.getServer().getServicesManager().getRegistration(Permission.class);
-        if (rsp == null) {
-            return;
+        RegisteredServiceProvider<Permission> permissionProvider = plugin.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (permissionProvider != null) {
+            permission = permissionProvider.getProvider();
         }
-        permission = rsp.getProvider();
+        return (permission != null);
     }
     
     public boolean hasPermission(Player p, String perm) {

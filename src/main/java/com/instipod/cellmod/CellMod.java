@@ -171,7 +171,12 @@ public class CellMod extends JavaPlugin {
         } catch (SQLException ex) {
         }
         TLogger.log(Level.INFO, towercount.toString() + " towers loaded.");
-        economy.setup();
+        if (!economy.setup()) {
+            TLogger.log(Level.SEVERE, "Failed to find Economy!");
+        }
+        if (!permission.setup()) {
+            TLogger.log(Level.SEVERE, "Failed to find Permissions!");
+        }
         addCommand("cell", cellcmd);
         addCommand("number", numcmd);
         addCommand("send", sendcmd);
