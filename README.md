@@ -6,6 +6,10 @@ CellMod-ng is a plugin for Bukkit-compatible servers that provides text-based "c
 
 CellMod-ng is released as open-source under the GNU Affero General Public License v3 license.
 
+Configuration
+=============
+CellMod-ng is configured exactly the same as CellMod is. No changes should be necessary to run it (just drop it in your plugins folder and rename the CellMod folder to CellMod-ng, that's it).
+
 TODO
 ======
 See Issues page
