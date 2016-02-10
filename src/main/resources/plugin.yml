@@ -1,7 +1,7 @@
-name: CellMod
-author: Instipod
-main: com.instipod.cellmod.CellMod
-version: 4.0-SNAPSHOT
+name: CellMod-ng
+author: Jordan Bussanich
+main: com.jordanbussanich.cellmod-ng.CellMod-ng
+version: 1.0
 description: Cellular Phones in Minecraft.
 depend: [Vault]
 
