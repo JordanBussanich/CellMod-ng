@@ -1,4 +1,4 @@
-package com.instipod.cellmod;
+package com.jordanbussanich.cellmodng;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

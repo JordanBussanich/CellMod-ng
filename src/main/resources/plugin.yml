@@ -1,6 +1,6 @@
 name: CellMod-ng
 author: Jordan Bussanich
-main: com.jordanbussanich.cellmod-ng.CellMod-ng
+main: com.jordanbussanich.cellmodng.CellMod
 version: 1.0
 description: Cellular Phones in Minecraft.
 depend: [Vault]

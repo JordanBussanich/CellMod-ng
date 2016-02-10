@@ -1,4 +1,4 @@
-package com.instipod.cellmod;
+package com.jordanbussanich.cellmodng;
 
 import java.util.Hashtable;
 import java.util.Map;

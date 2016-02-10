@@ -1,4 +1,4 @@
-package com.instipod.cellmod;
+package com.jordanbussanich.cellmodng;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
