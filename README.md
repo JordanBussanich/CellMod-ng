@@ -8,22 +8,20 @@ CellMod is released as open-source under the GNU Affero General Public License v
 
 TODO
 ======
-- Fix a bug where the carrier's price doesn't change
-- Update Numbers System to support multiple number changes for a per-carrier fee
-- Server taxes
-- Fix Formatting
+See Issues page
 
 Compiling
 ===========
-CellMod is built to be compiled under Java 6 or newer.  You will also need Maven 3 for dependencies and compiling.
+CellMod is built to be compiled under Java 7 or newer.
 
 Contributing
 ==============
 Pull requests are accepted for bug fixes and improvements.  However, they must follow these guidelines:
-- The code must compile under Java 6
+- The code must compile under Java 7
 - The Pull must be licensed under the GNU Affero General Public License v3 license.
-- Make your code look nice.
-- Test your code!
+- The code must be formatted using IntelliJ's default settings
+- The code must be tested
+- The code must not break existing installs (don't break the DB!)
 
 Credits
 ==============
