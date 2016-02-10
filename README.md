@@ -2,7 +2,7 @@ CellMod-ng
 ========
 Fork of CellMod
 
-CellMod-ng is a plugin for Bukkit-compatible servers that provides text-based "cell phones" for player-to-player messaging.
+CellMod-ng is a plugin for Spigot-compatible servers that provides text-based "cell phones" for player-to-player messaging.
 
 CellMod-ng is released as open-source under the GNU Affero General Public License v3 license.
 
