@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 
 public class Carrier {
@@ -108,6 +109,10 @@ public class Carrier {
 
     public Double getCost() {
         return cost;
+    }
+
+    public void setCost(Double cost) {
+        this.cost = cost;
     }
 
     public ArrayList getRawTOS() {

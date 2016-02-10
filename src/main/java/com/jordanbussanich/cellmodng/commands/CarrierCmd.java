@@ -71,6 +71,9 @@ public class CarrierCmd implements CommandExecutor {
                             Carrier playercarrier = plugin.getPlayerCarrier(p);
                             if (plugin.isPlayerCarrierOwner(p, playercarrier)) {
                                 plugin.runUpdateQuery("UPDATE carriers SET MessagePrice='" + strings[1] + "' WHERE Name='" + playercarrier.getName() + "';");
+                                plugin.carriers.remove(playercarrier);
+                                playercarrier.setCost(Double.valueOf(strings[1]));
+                                plugin.carriers.put(playercarrier.getName(), playercarrier);
                                 p.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("ChangedPrice"));
                             } else {
                                 // no permission
