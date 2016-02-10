@@ -4,8 +4,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @description Handles the logging of the plugin
  * @author Tagette
+ * @description Handles the logging of the plugin
  */
 public class TLogger {
 

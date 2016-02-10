@@ -9,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+
 public class CCCmd implements CommandExecutor {
 
     private final CellMod plugin;
@@ -28,26 +30,26 @@ public class CCCmd implements CommandExecutor {
             return true;
         }
         Player user = (Player) cs;
-        Block target = user.getTargetBlock(null, 100);
+        Block target = user.getTargetBlock((HashSet<Byte>) null, 100);
         if (target.getTypeId() == plugin.mainConfig.getInt("tower.material")) {
             if (plugin.hasPermission(user, "cellmod.createcarrier")) {
                 Carrier playercarrier = plugin.getPlayerCarrier(user);
                 if (plugin.isPlayerCarrierOwner(user, playercarrier)) {
-                plugin.runInsertQuery("INSERT INTO towers (BlockWorld, BlockX, BlockY, BlockZ, Carrier) VALUES ('" + target.getWorld().getName() + "', '" + target.getX() + "', '" + target.getY() + "', '" + target.getZ() + "', '" + playercarrier.getName() + "');");
-                plugin.globaltos.put(target.getLocation(), playercarrier.getName());
-                playercarrier.addTower(target.getLocation());
-                user.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("TCreated"));
+                    plugin.runInsertQuery("INSERT INTO towers (BlockWorld, BlockX, BlockY, BlockZ, Carrier) VALUES ('" + target.getWorld().getName() + "', '" + target.getX() + "', '" + target.getY() + "', '" + target.getZ() + "', '" + playercarrier.getName() + "');");
+                    plugin.globaltos.put(target.getLocation(), playercarrier.getName());
+                    playercarrier.addTower(target.getLocation());
+                    user.sendMessage(ChatColor.GREEN + plugin.languageConfig.getString("TCreated"));
                 } else {
                     user.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
                 }
             } else {
                 user.sendMessage(ChatColor.RED + plugin.languageConfig.getString("NoPermission"));
-            }    
+            }
         } else {
             user.sendMessage(ChatColor.RED + plugin.languageConfig.getString("WrongBlockType"));
         }
         return true;
     }
-    
+
 }
 

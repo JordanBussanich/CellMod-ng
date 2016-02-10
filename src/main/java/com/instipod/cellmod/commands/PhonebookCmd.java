@@ -4,9 +4,11 @@ package com.instipod.cellmod.commands;
 
 import com.instipod.cellmod.CellMod;
 import com.instipod.cellmod.TLogger;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,11 +17,11 @@ import org.bukkit.entity.Player;
 
 public class PhonebookCmd implements CommandExecutor {
     private CellMod plugin;
-    
+
     public PhonebookCmd(CellMod p) {
         plugin = p;
     }
-    
+
     @Override
     public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings) {
         Player pl = null;
@@ -33,15 +35,15 @@ public class PhonebookCmd implements CommandExecutor {
         if (plugin.hasPermission(player, "cellmod.use")) {
             player.sendMessage(plugin.languageConfig.getString("PhonebookTitle") + ":");
             for (Player p : plugin.getServer().getOnlinePlayers()) {
-                 ResultSet rs = plugin.getResult("SELECT * FROM players WHERE Player='" + p.getName() + "';");
-        String number = null;
-        try {
-            while (rs.next()) {
-                number = rs.getString("Number");
-            }
-        } catch (SQLException ex) {
-            TLogger.log(Level.SEVERE, "Failed to read player number for phonebook!");
-        }
+                ResultSet rs = plugin.getResult("SELECT * FROM players WHERE Player='" + p.getName() + "';");
+                String number = null;
+                try {
+                    while (rs.next()) {
+                        number = rs.getString("Number");
+                    }
+                } catch (SQLException ex) {
+                    TLogger.log(Level.SEVERE, "Failed to read player number for phonebook!");
+                }
                 player.sendMessage(p.getName() + " - " + number);
             }
         } else {
@@ -49,5 +51,5 @@ public class PhonebookCmd implements CommandExecutor {
         }
         return true;
     }
-    
+
 }
