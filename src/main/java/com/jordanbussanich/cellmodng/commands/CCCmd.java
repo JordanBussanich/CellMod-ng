@@ -31,7 +31,7 @@ public class CCCmd implements CommandExecutor {
         }
         Player user = (Player) cs;
         Block target = user.getTargetBlock((HashSet<Byte>) null, 100);
-        if (target.getTypeId() == plugin.mainConfig.getInt("tower.material")) {
+        if (target.getTypeId() == plugin.mainConfig.getInt("towers.material")) {
             if (plugin.hasPermission(user, "cellmod.createcarrier")) {
                 Carrier playercarrier = plugin.getPlayerCarrier(user);
                 if (plugin.isPlayerCarrierOwner(user, playercarrier)) {
